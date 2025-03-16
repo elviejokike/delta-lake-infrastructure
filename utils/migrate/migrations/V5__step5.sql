@@ -1,0 +1,1 @@
+ALTER TABLE icebergnessie.test.tabledoesnotexist RENAME COLUMN value TO value_x;
