@@ -1,8 +1,12 @@
 import os
 
+import logging
 import sqlparse
 import trino
 from config import TRINO_CONFIG, MIGRATIONS_PATH
+
+logger = logging.getLogger("migration")
+logging.basicConfig(level=logging.INFO)
 
 # Create Trino connection
 def get_trino_connection():
@@ -26,7 +30,7 @@ def apply_migration(cursor, migration_file, version):
         sql_content = f.read()
         statements = [stmt.strip().rstrip(";") for stmt in sqlparse.split(sql_content) if stmt.strip()]
         for statement in statements:
-            print(f"Executing: {statement}")
+            logger.info(f"Executing: {statement}")
             cursor.execute(statement)
 
         cursor.execute(
@@ -51,16 +55,23 @@ def run_migrations():
 
     # Sort migration files (ensures proper order)
     migration_files = sorted(os.listdir(MIGRATIONS_PATH))
-    print(migration_files)
+    logger.info("List of found migration files" + str(migration_files))
 
-    for file in migration_files:
-        if file.endswith(".sql"):
-            version = file.split("__")[0]  # Extract version from filename
-            if version not in applied_migrations:
-                apply_migration(cursor, os.path.join(MIGRATIONS_PATH, file), version)
-                print(version + " applied successfully ✅")
+    try:
 
-    print("✅ All migrations applied successfully!")
+        for file in migration_files:
+            if file.endswith(".sql"):
+                version = file.split("__")[0]  # Extract version from filename
+                if version not in applied_migrations:
+                    apply_migration(cursor, os.path.join(MIGRATIONS_PATH, file), version)
+                    logger.info(version + " applied successfully ✅")
+                else:
+                    logger.info(version + " already applied ❌")
+
+        logger.info("✅ All migrations applied successfully!")
+    except Exception as e:
+        logger.error("❌ DataMigrationFailed An error occurred while applying migrations")
+        logger.error(e)
 
 if __name__ == "__main__":
     run_migrations()
