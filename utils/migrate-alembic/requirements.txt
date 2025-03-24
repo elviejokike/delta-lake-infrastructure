@@ -1,0 +1,4 @@
+alembic==1.15.1
+sqlalchemy
+trino==0.333.0
+trino[sqlalchemy]
