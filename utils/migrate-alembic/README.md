@@ -1,5 +1,7 @@
 # Migrations with Alembic
 
+[Alembi](https://alembic.sqlalchemy.org/en/latest/) is python-based migration making for usage with the  [SQLAlquemy](https://www.sqlalchemy.org/) ecosystem.
+
 ## Setup
 
 Create a virtual python environment.
@@ -23,4 +25,10 @@ Alembic use a table called *alembic_version* to keep track of the latest applied
 CREATE TABLE icebergnessie.test.alembic_version (
     version_num VARCHAR(32) NOT NULL
 );
+```
+
+## Run alembic
+
+```sh
+alembic upgrade head
 ```
